@@ -1,0 +1,492 @@
+openapi: 3.0.0
+servers:
+  - url: 'https://api-eu1.tatum.io'
+info:
+  version: 1.1.0
+  title: Tatum Cardano API
+tags:
+  - description: |
+      Cardano connection APIs
+    name: Blockchain / Cardano
+paths:
+  /v3/cardano/info:
+    get:
+      tags:
+        - Blockchain / Cardano
+      summary: Get current Cardano block
+      description: <p>Get current Cardano block.</p>
+      operationId: CardanoGetCurrentBlock
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tip:
+                    type: object
+                    properties:
+                      number:
+                        description: a number of block
+                        type: number
+                        example: 26585295
+                      slotNo:
+                        description: Slot number.
+                        type: number
+                        example: 10094640
+                      epoch:
+                        type: object
+                        properties:
+                          number:
+                            description: Epoch number.
+                            type: number
+                            example: 10094640
+                  testnet:
+                    description: The block is from mainnet or testnet
+                    type: boolean
+                    example: false
+          description: OK
+        500:
+          $ref: "#/components/schemas/error500"
+  /v3/Cardano/block/:hash:
+    get:
+      tags:
+        - Blockchain / Cardano
+      summary: Get Cardano block
+      description: <br/><p>Get Cardano block by its hash.</p>
+      operationId: CardanoGetBlock
+      parameters:
+        - in: path
+          name: hash
+          required: true
+          description: The hash code of the block.
+          schema:
+            $ref: "#/components/schemas/hash"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardanoBlock"
+          description: OK
+        500:
+          $ref: "#/components/schemas/error500"
+  /v3/Cardano/transaction/:hash:
+    get:
+      tags:
+        - Blockchain / Cardano
+      summary: Get transaction by its hash
+      description: <p>Get Cardano transaction</p>
+      operationId: CardanoTx
+      parameters:
+        - in: path
+          name: hash
+          required: true
+          description: The hash code of transaction.
+          schema:
+            $ref: "#/components/schemas/hash"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardanoTx"
+          description: OK
+        500:
+          $ref: "#/components/schemas/error500"
+  /v3/cardano/account/:address:
+    get:
+      tags:
+        - Blockchain / Cardano
+      summary: Get account by its address
+      description: <p>Get Cardano account</p>
+      operationId: CardanoGetAccount
+      parameters:
+        - in: path
+          name: address
+          required: true
+          description: The address of an account.
+          schema:
+            $ref: "#/components/schemas/address"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summary:
+                    type: object
+                    properties:
+                      assetBalances:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            asset:
+                              type: object
+                              description: the information of an asset
+                              properties:
+                                assetId:
+                                  type: string
+                                  description: the ID of asset
+                                  example: "ada"
+                                assetName:
+                                  type: string
+                                  description: the name of asset
+                                  example: "ada"
+                                description:
+                                  type: string
+                                  description: the description of asset
+                                  example: null
+                                logo:
+                                  type: string
+                                  description: the logo of asset
+                                  example: null
+                                metadataHash:
+                                  type: string
+                                  description: the hash code of metadata for the asset
+                                  example: null
+                                name:
+                                  type: string
+                                  description: the name of asset
+                                  example: "ada"
+                                url:
+                                  type: string
+                                  description: the url of asset
+                                  example: null
+                            quantity:
+                              type: string
+                              description: the quantity of asset
+                              example: "20000000000000"
+                      utxosCount:
+                        type: number
+                        description: a number of unspent transaction outputs
+                        example: 1
+          description: OK
+        500:
+          $ref: "#/components/schemas/error500"
+  /v3/cardano/transaction/account/:address:
+    get:
+      tags:
+        - Blockchain / Cardano
+      summary: Get transactions by account
+      description: <p>Get Cardano transactions by account</p>
+      operationId: CardanoAccountTx
+      parameters:
+        - in: path
+          name: address
+          required: true
+          description: The address of an account.
+          schema:
+            $ref: "#/components/schemas/address"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CardanoTx"
+          description: OK
+        500:
+          $ref: "#/components/schemas/error500"
+  /v3/cardano/address/:xpub/:i:
+    get:
+      tags:
+        - Blockchain / Cardano
+      summary: Genarate address from xpub and derivation path
+      description: <p>Generate Cardano deposit address from Extended public key. Deposit address is generated for the specific index - each extended public key can generate
+        up to 2^32 addresses starting from index 0 until 2^31</p>
+      operationId: CardanoGenerateAddress
+      parameters:
+        - description: "Extended public key of wallet."
+          in: path
+          name: xpub
+          required: true
+          example: 0244b3f40c6e570ae0032f6d7be87737a6c4e5314a4a1a82e22d0460a0d0cd794936c61f0c80dc74ace4cd04690d4eeb1aa6555883be006e1748306faa7ed3a26a
+          schema:
+            type: string
+        - description: "Derivation index of desired address to be generated."
+          in: path
+          name: i
+          required: true
+          example: 1
+          schema:
+            type: number
+            minimum: 0
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  address:
+                    type: string
+                    description: Cardano address
+                    example: "b391e4a2f4a01246dbc18053bb8dcaf38a8ebb5e3a1250f13d3dc890690c0519548b6dd6209f6e9dbc423676841d281271a0891c49b9aa04dbbbe79789e80361"
+          description: OK
+        500:
+          $ref: "#/components/schemas/error500"
+  /v3/cardano/wallet/priv:
+    post:
+      description: |
+        <p>Generate private key from mnemonic.</p>
+      operationId: CardanoGeneratePrivateKeyFromMnemonic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mnemonic:
+                  type: string
+                  description: Mnemonic string
+                  example: "reward erosion ripple critic legend leader zero start open stem spend ritual faint home vocal"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key:
+                    type: string
+                    description: private key
+                    example: "0c7e234a5a8e37686d42d596cd3eb6e861e705c4f9a728387dbbe724ff638906cd60b4fbc774e5f8d265c061df4d20db1e6384c2f876a5a9c76fe9e4deb984"
+          description: OK
+        500:
+          $ref: "#/components/schemas/error500"
+components:
+  schemas:
+    error500:
+      type: object
+      description: Error caused by the server
+      properties:
+        message:
+          type: string
+          example: "Internal server error"
+        statusCode:
+          type: number
+          example: 500
+    hash:
+      type: string
+      example: "000000000195a8cfe2ea4ca60ce921b30e95980a96c6bb1da4a35aa03da9c5a8"
+    number:
+      type: number
+      example: 8
+    fee:
+      type: number
+      example: 0
+    index:
+      type: number
+      example: 0
+    timestamp:
+      type: string
+      example: "2019-07-24T20:20:16Z"
+    count:
+      type: string
+      example: "1"
+    address:
+      type: string
+      example: "37btjrVyb4KCXcXAQN1QNphHShuuD2VpUPqogWVU3YpuabnoiVixQnJrFyDjgf7PaCAVKYTcBV6RnaaQ2Vetbg1Tqf9MozMVxMne3NPYTTRoogjGPB"
+    size:
+      type: number
+      example: 1950
+
+    CardanoBlock:
+      type: object
+      properties:
+        fees:
+          description: Block fees
+          $ref: "#/components/schemas/fee"
+        slotLeader:
+          type: object
+          properties:
+            description:
+              type: string
+              description: SlotLeader description
+              example: "ByronGenesis-853b49c9ab5fc52d"
+            hash:
+              description: SlotLeader hash
+              $ref: "#/components/schemas/hash"
+        forgedAt:
+          description: Sign time
+          $ref: "#/components/schemas/timestamp"
+        merkelRoot:
+          type: string
+          description: Block merkelRoot
+          example: "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
+        opCert:
+          type: string
+          description: Block opCert
+          example: "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
+        slotInEpoch:
+          type: number
+          description: Slot in Epoch
+          example: 1031
+        slotNo:
+          type: number
+          description: Number of slots
+          example: 1031
+        protocolVersion:
+          type: object
+          properties:
+            major:
+              type: number
+              description: protocol version major
+              example: 0
+            minor:
+              type: number
+              description: protocol version minor
+              example: 0
+        size:
+          description: Size of the block
+          $ref: "#/components/schemas/size"
+        transactionsCount:
+          description: Count transactions of the block
+          $ref: "#/components/schemas/count"
+        transactions:
+          type: array
+          description: transactions of the blocks
+          items:
+            type: object
+            properties:
+              hash:
+                description: The hash of the transaction
+                $ref: "#/components/schemas/hash"
+        nextBlock:
+          type: object
+          description: Next Block
+          properties:
+            hash:
+              description: The hash of the next block
+              $ref: "#/components/schemas/hash"
+            number:
+              description: The next block number
+              $ref: "#/components/schemas/number"
+        previousBlock:
+          type: object
+          description: Next Block
+          properties:
+            hash:
+              description: The hash of the previous block
+              $ref: "#/components/schemas/hash"
+            number:
+              description: number of the next block
+              $ref: "#/components/schemas/number"
+        vrfKey:
+          type: string
+          description: Verification key of the block
+          example: "e5b6b13eacc21968953ecb78eb900c1eaa2b4744ffead8719f9064f4863e1813"
+    CardanoTx:
+      type: object
+      properties:
+        block:
+          type: object
+          description: The block of transaction.
+          properties:
+            hash:
+              description: The hash of the block.
+              $ref: "#/components/schemas/hash"
+            number:
+              description: The number of the block.
+              $ref: "#/components/schemas/number"
+        blockIndex:
+          description: Index of block
+          $ref: "#/components/schemas/index"
+        deposit:
+          type: number
+          description: The deposit of transaction
+          example: 0
+        fee:
+          description: The fee of transaction
+          $ref: "#/components/schemas/fee"
+        inputs:
+          type: array
+          items:
+            type: object
+            properties:
+              address:
+                description: The address of the transaction input.
+                $ref: "#/components/schemas/address"
+              sourceTxHash:
+                description: The hash of the transaction.
+                $ref: "#/components/schemas/hash"
+              sourceTxIndex:
+                description: Index of source Transaction
+                $ref: "#/components/schemas/index"
+        inputs_aggregate:
+          type: object
+          properties:
+            aggregate:
+              type: object
+              properties:
+                count:
+                  description: A number of the aggregate.
+                  $ref: "#/components/schemas/count"
+        outputs:
+          type: array
+          items:
+            type: object
+            properties:
+              address:
+                description: Address of transaction output.
+                $ref: "#/components/schemas/address"
+              index:
+                description: Index of transaction output.
+                $ref: "#/components/schemas/index"
+              txHash:
+                description: Hash of transaction output.
+                $ref: "#/components/schemas/hash"
+              value:
+                type: string
+                description: Value of transaction output.
+                example: "385509000000"
+        outputs_aggregate:
+          type: object
+          items:
+            properties:
+              aggregate:
+                type: object
+                properties:
+                  count:
+                    description: The number of the outputs aggregate.
+                    $ref: "#/components/schemas/count"
+        invalidBefore:
+          type: string
+          example: null
+        invalidHereafter:
+          type: string
+          example: null
+        size:
+          description: The size of the transaction.
+          $ref: "#/components/schemas/size"
+        totalOutput:
+          type: string
+          description: Total output
+          example: "20000000000000"
+        includedAt:
+          type: string
+          $ref: "#/components/schemas/timestamp"
+        withdrawals:
+          type: array
+          items:
+            properties:
+              hash:
+                description: The hash of withdrawal.
+                $ref: "#/components/schemas/hash"
+              number:
+                description: A number of withdrawal.
+                $ref: "#/components/schemas/number"
+        withdrawals_aggregate:
+          type: object
+          properties:
+            aggregate:
+              type: object
+              properties:
+                count:
+                  description: A number of withdrawals aggregate
+                  $ref: "#/components/schemas/count"
