@@ -1,0 +1,327 @@
+openapi: 3.0.0
+servers:
+  - url: 'https://api-eu1.tatum.io'
+info:
+  version: 1.1.0
+  title: Tatum Cardano API
+tags:
+  - description: |
+      Cardano connection APIs
+    name: Blockchain / Cardano
+paths:
+  /v3/cardano/info:
+    get:
+      tags:
+        - Blockchain / Cardano
+      summary: Get current Cardano block
+      description: <p>Get current Cardano block.</p>
+      operationId: CardanoGetCurrentBlock
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tip:
+                    type: object
+                    properties:
+                      number:
+                        description: a number of block
+                        type: number
+                        example: 26585295
+                      slotNo:
+                        description: Slot number.
+                        type: number
+                        example: 10094640
+                      epoch:
+                        type: object
+                        properties:
+                          number:
+                            description: Epoch number.
+                            type: number
+                            example: 10094640
+                  testnet:
+                    description: The block is from mainnet or testnet
+                    type: boolean
+                    example: false
+          description: OK
+        500:
+          $ref: "#/components/schemas/error500"
+  /v3/Cardano/block/:hash:
+    get:
+      tags:
+        - Blockchain / Cardano
+      summary: Get Cardano block
+      description: <br/><p>Get Cardano block by its hash.</p>
+      operationId: CardanoGetBlock
+      parameters:
+        - in: path
+          name: hash
+          required: true
+          description: The hash code of the block.
+          schema:
+            $ref: "#/components/schemas/hash"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardanoBlock"
+          description: OK
+        500:
+          $ref: "#/components/schemas/error500"
+  /v3/Cardano/transaction/:hash:
+    get:
+      tags:
+        - Blockchain / Cardano
+      summary: Get transaction by its hash
+      description: <p>Get Cardano transaction</p>
+      operationId: CardanoTx
+      parameters:
+        - in: path
+          name: hash
+          required: true
+          description: The hash code of transaction.
+          schema:
+            $ref: "#/components/schemas/hash"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardanoTx"
+          description: OK
+        500:
+          $ref: "#/components/schemas/error500"
+components:
+  schemas:
+    error500:
+      type: object
+      description: Error caused by the server
+      properties:
+        message:
+          type: string
+          example: "Internal server error"
+        statusCode:
+          type: number
+          example: 500
+    hash:
+      type: string
+      example: "000000000195a8cfe2ea4ca60ce921b30e95980a96c6bb1da4a35aa03da9c5a8"
+    number:
+      type: number
+      example: 8
+    fee:
+      type: number
+      example: 0
+    index:
+      type: number
+      example: 0
+    timestamp:
+      type: string
+      example: "2019-07-24T20:20:16Z"
+    count:
+      type: string
+      example: "1"
+    address:
+      type: string
+      example: "37btjrVyb4KCXcXAQN1QNphHShuuD2VpUPqogWVU3YpuabnoiVixQnJrFyDjgf7PaCAVKYTcBV6RnaaQ2Vetbg1Tqf9MozMVxMne3NPYTTRoogjGPB"
+    size:
+      type: number
+      example: 1950
+
+    CardanoBlock:
+      type: object
+      properties:
+        fees:
+          description: Block fees
+          $ref: "#/components/schemas/fee"
+        slotLeader:
+          type: object
+          properties:
+            description:
+              type: string
+              description: SlotLeader description
+              example: "ByronGenesis-853b49c9ab5fc52d"
+            hash:
+              description: SlotLeader hash
+              $ref: "#/components/schemas/hash"
+        forgedAt:
+          description: Sign time
+          $ref: "#/components/schemas/timestamp"
+        merkelRoot:
+          type: string
+          description: Block merkelRoot
+          example: "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
+        opCert:
+          type: string
+          description: Block opCert
+          example: "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
+        slotInEpoch:
+          type: number
+          description: Slot in Epoch
+          example: 1031
+        slotNo:
+          type: number
+          description: Number of slots
+          example: 1031
+        protocolVersion:
+          type: object
+          properties:
+            major:
+              type: number
+              description: protocol version major
+              example: 0
+            minor:
+              type: number
+              description: protocol version minor
+              example: 0
+        size:
+          description: Size of the block
+          $ref: "#/components/schemas/size"
+        transactionsCount:
+          description: Count transactions of the block
+          $ref: "#/components/schemas/count"
+        transactions:
+          type: array
+          description: transactions of the blocks
+          items:
+            type: object
+            properties:
+              hash:
+                description: The hash of the transaction
+                $ref: "#/components/schemas/hash"
+        nextBlock:
+          type: object
+          description: Next Block
+          properties:
+            hash:
+              description: The hash of the next block
+              $ref: "#/components/schemas/hash"
+            number:
+              description: The next block number
+              $ref: "#/components/schemas/number"
+        previousBlock:
+          type: object
+          description: Next Block
+          properties:
+            hash:
+              description: The hash of the previous block
+              $ref: "#/components/schemas/hash"
+            number:
+              description: number of the next block
+              $ref: "#/components/schemas/number"
+        vrfKey:
+          type: string
+          description: Verification key of the block
+          example: "e5b6b13eacc21968953ecb78eb900c1eaa2b4744ffead8719f9064f4863e1813"
+    CardanoTx:
+      type: object
+      properties:
+        block:
+          type: object
+          description: The block of transaction.
+          properties:
+            hash:
+              description: The hash of the block.
+              $ref: "#/components/schemas/hash"
+            number:
+              description: The number of the block.
+              $ref: "#/components/schemas/number"
+        blockIndex:
+          description: Index of block
+          $ref: "#/components/schemas/index"
+        deposit:
+          type: number
+          description: The deposit of transaction
+          example: 0
+        fee:
+          description: The fee of transaction
+          $ref: "#/components/schemas/fee"
+        inputs:
+          type: array
+          items:
+            type: object
+            properties:
+              address:
+                description: The address of the transaction input.
+                $ref: "#/components/schemas/address"
+              sourceTxHash:
+                description: The hash of the transaction.
+                $ref: "#/components/schemas/hash"
+              sourceTxIndex:
+                description: Index of source Transaction
+                $ref: "#/components/schemas/index"
+        inputs_aggregate:
+          type: object
+          properties:
+            aggregate:
+              type: object
+              properties:
+                count:
+                  description: A number of the aggregate.
+                  $ref: "#/components/schemas/count"
+        outputs:
+          type: array
+          items:
+            type: object
+            properties:
+              address:
+                description: Address of transaction output.
+                $ref: "#/components/schemas/address"
+              index:
+                description: Index of transaction output.
+                $ref: "#/components/schemas/index"
+              txHash:
+                description: Hash of transaction output.
+                $ref: "#/components/schemas/hash"
+              value:
+                type: string
+                description: Value of transaction output.
+                example: "385509000000"
+        outputs_aggregate:
+          type: object
+          items:
+            properties:
+              aggregate:
+                type: object
+                properties:
+                  count:
+                    description: The number of the outputs aggregate.
+                    $ref: "#/components/schemas/count"
+        invalidBefore:
+          type: string
+          example: null
+        invalidHereafter:
+          type: string
+          example: null
+        size:
+          description: The size of the transaction.
+          $ref: "#/components/schemas/size"
+        totalOutput:
+          type: string
+          description: Total output
+          example: "20000000000000"
+        includedAt:
+          type: string
+          $ref: "#/components/schemas/timestamp"
+        withdrawals:
+          type: array
+          items:
+            properties:
+              hash:
+                description: The hash of withdrawal.
+                $ref: "#/components/schemas/hash"
+              number:
+                description: A number of withdrawal.
+                $ref: "#/components/schemas/number"
+        withdrawals_aggregate:
+          type: object
+          properties:
+            aggregate:
+              type: object
+              properties:
+                count:
+                  description: A number of withdrawals aggregate
+                  $ref: "#/components/schemas/count"
