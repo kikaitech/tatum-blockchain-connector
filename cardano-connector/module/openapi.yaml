@@ -94,6 +94,103 @@ paths:
           description: OK
         500:
           $ref: "#/components/schemas/error500"
+  /v3/cardano/account/:address:
+    get:
+      tags:
+        - Blockchain / Cardano
+      summary: Get account by its address
+      description: <p>Get Cardano account</p>
+      operationId: CardanoGetAccount
+      parameters:
+        - in: path
+          name: address
+          required: true
+          description: The address of an account.
+          schema:
+            $ref: "#/components/schemas/address"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summary:
+                    type: object
+                    properties:
+                      assetBalances:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            asset:
+                              type: object
+                              description: the information of an asset
+                              properties:
+                                assetId:
+                                  type: string
+                                  description: the ID of asset
+                                  example: "ada"
+                                assetName:
+                                  type: string
+                                  description: the name of asset
+                                  example: "ada"
+                                description:
+                                  type: string
+                                  description: the description of asset
+                                  example: null
+                                logo:
+                                  type: string
+                                  description: the logo of asset
+                                  example: null
+                                metadataHash:
+                                  type: string
+                                  description: the hash code of metadata for the asset
+                                  example: null
+                                name:
+                                  type: string
+                                  description: the name of asset
+                                  example: "ada"
+                                url:
+                                  type: string
+                                  description: the url of asset
+                                  example: null
+                            quantity:
+                              type: string
+                              description: the quantity of asset
+                              example: "20000000000000"
+                      utxosCount:
+                        type: number
+                        description: a number of unspent transaction outputs
+                        example: 1
+          description: OK
+        500:
+          $ref: "#/components/schemas/error500"
+  /v3/cardano/transaction/account/:address:
+    get:
+      tags:
+        - Blockchain / Cardano
+      summary: Get transactions by account
+      description: <p>Get Cardano transactions by account</p>
+      operationId: CardanoAccountTx
+      parameters:
+        - in: path
+          name: address
+          required: true
+          description: The address of an account.
+          schema:
+            $ref: "#/components/schemas/address"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CardanoTx"
+          description: OK
+        500:
+          $ref: "#/components/schemas/error500"
 components:
   schemas:
     error500:

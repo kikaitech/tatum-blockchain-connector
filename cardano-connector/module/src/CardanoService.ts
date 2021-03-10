@@ -1,4 +1,4 @@
-import { Block, Transaction } from '@cardano-graphql/client-ts';
+import { Block, Transaction, PaymentAddress } from '@cardano-graphql/client-ts';
 import axios from 'axios';
 import { PinoLogger } from 'nestjs-pino';
 import * as Tatum from '@tatumio/tatum';
@@ -93,5 +93,49 @@ export abstract class CardanoService {
       })
     ).data.data.transactions;
     return transaction;
+  }
+
+  public async getAccount(address: string): Promise<PaymentAddress> {
+    const graphQLUrl = await this.getGraphQLEndpoint();
+    const [account] = (
+      await axios.post(graphQLUrl, {
+        query: `{paymentAddresses (addresses: "${address}") {
+          summary {
+            utxosCount
+            assetBalances {
+              asset { assetId assetName name description logo metadataHash url }
+              quantity
+            }
+          }
+        } }`,
+      })
+    ).data.data.paymentAddresses;
+    return account;
+  }
+
+  public async getTransactionsByAccount(address: string): Promise<Transaction[]> {
+    const graphQLUrl = await this.getGraphQLEndpoint();
+    const { transactions } = (
+      await axios.post(graphQLUrl, {
+        query: `{ transactions (where: { inputs: {address:{_eq: "${address}" }}}) {
+          block { hash number }
+          blockIndex
+          deposit
+          fee
+          inputs { address sourceTxHash sourceTxIndex }
+          inputs_aggregate { aggregate { count } }
+          outputs { address index txHash value }
+          outputs_aggregate { aggregate { count }}
+          invalidBefore
+          invalidHereafter
+          size
+          totalOutput
+          includedAt
+          withdrawals { address amount transaction { hash }}
+          withdrawals_aggregate { aggregate { count } }
+        } }`,
+      })
+    ).data.data;
+    return transactions;
   }
 }
