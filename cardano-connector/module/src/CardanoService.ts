@@ -99,7 +99,7 @@ export abstract class CardanoService {
     const graphQLUrl = await this.getGraphQLEndpoint();
     const [account] = (
       await axios.post(graphQLUrl, {
-        query: `{paymentAddresses (addresses: "${address}") {
+        query: `{ paymentAddresses (addresses: "${address}") {
           summary {
             utxosCount
             assetBalances {
@@ -117,23 +117,29 @@ export abstract class CardanoService {
     const graphQLUrl = await this.getGraphQLEndpoint();
     const { transactions } = (
       await axios.post(graphQLUrl, {
-        query: `{ transactions (where: { inputs: {address:{_eq: "${address}" }}}) {
-          block { hash number }
-          blockIndex
-          deposit
-          fee
-          inputs { address sourceTxHash sourceTxIndex }
-          inputs_aggregate { aggregate { count } }
-          outputs { address index txHash value }
-          outputs_aggregate { aggregate { count }}
-          invalidBefore
-          invalidHereafter
-          size
-          totalOutput
-          includedAt
-          withdrawals { address amount transaction { hash }}
-          withdrawals_aggregate { aggregate { count } }
-        } }`,
+        query: `{ transactions (where: {
+            _or: [
+              { inputs: { address: { _eq: "${address}" } } }
+              { outputs: { address: { _eq: "${address}" } } }
+            ]
+          }) {
+            block { hash number }
+            blockIndex
+            deposit
+            fee
+            inputs { address sourceTxHash sourceTxIndex }
+            inputs_aggregate { aggregate { count } }
+            outputs { address index txHash value }
+            outputs_aggregate { aggregate { count }}
+            invalidBefore
+            invalidHereafter
+            size
+            totalOutput
+            includedAt
+            withdrawals { address amount transaction { hash }}
+            withdrawals_aggregate { aggregate { count } }
+          }
+        }`,
       })
     ).data.data;
     return transactions;

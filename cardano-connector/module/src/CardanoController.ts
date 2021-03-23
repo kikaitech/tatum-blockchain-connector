@@ -61,7 +61,7 @@ export abstract class CardanoController {
     }
   }
 
-  @Get('/v3/cardano/transaction/account/:address')
+  @Get('/v3/cardano/account/:address/transactions')
   async getTransactionsByAccount(@Param('address') address: string): Promise<Transaction[]> {
     try {
       return await this.service.getTransactionsByAccount(address);
