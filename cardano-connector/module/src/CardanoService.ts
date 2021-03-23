@@ -144,4 +144,16 @@ export abstract class CardanoService {
     ).data.data;
     return transactions;
   }
+
+  public async generateAddress(xpub: string, i: number): Promise<{ address: string }> {
+    const testnet = await this.isTestnet();
+    const address = await Tatum.generateAddressFromXPub(Tatum.Currency.ADA, testnet, xpub, i);
+    return { address };
+  }
+
+  public async generatePrivateKey(mnemonic: string, i: number): Promise<{ key: string }> {
+    const testnet = await this.isTestnet();
+    const key = await Tatum.generatePrivateKeyFromMnemonic(Tatum.Currency.ADA, testnet, mnemonic, i);
+    return { key };
+  }
 }

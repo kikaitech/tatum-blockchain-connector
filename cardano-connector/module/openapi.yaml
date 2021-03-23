@@ -191,6 +191,74 @@ paths:
           description: OK
         500:
           $ref: "#/components/schemas/error500"
+  /v3/cardano/address/:xpub/:i:
+    get:
+      tags:
+        - Blockchain / Cardano
+      summary: Genarate address from xpub and derivation path
+      description: <p>Generate Cardano deposit address from Extended public key. Deposit address is generated for the specific index - each extended public key can generate
+        up to 2^32 addresses starting from index 0 until 2^31</p>
+      operationId: CardanoGenerateAddress
+      parameters:
+        - description: "Extended public key of wallet."
+          in: path
+          name: xpub
+          required: true
+          example: 0244b3f40c6e570ae0032f6d7be87737a6c4e5314a4a1a82e22d0460a0d0cd794936c61f0c80dc74ace4cd04690d4eeb1aa6555883be006e1748306faa7ed3a26a
+          schema:
+            type: string
+        - description: "Derivation index of desired address to be generated."
+          in: path
+          name: i
+          required: true
+          example: 1
+          schema:
+            type: number
+            minimum: 0
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  address:
+                    type: string
+                    description: Cardano address
+                    example: "b391e4a2f4a01246dbc18053bb8dcaf38a8ebb5e3a1250f13d3dc890690c0519548b6dd6209f6e9dbc423676841d281271a0891c49b9aa04dbbbe79789e80361"
+          description: OK
+        500:
+          $ref: "#/components/schemas/error500"
+  /v3/cardano/wallet/priv:
+    post:
+      description: |
+        <p>Generate private key from mnemonic.</p>
+      operationId: CardanoGeneratePrivateKeyFromMnemonic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mnemonic:
+                  type: string
+                  description: Mnemonic string
+                  example: "reward erosion ripple critic legend leader zero start open stem spend ritual faint home vocal"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key:
+                    type: string
+                    description: private key
+                    example: "0c7e234a5a8e37686d42d596cd3eb6e861e705c4f9a728387dbbe724ff638906cd60b4fbc774e5f8d265c061df4d20db1e6384c2f876a5a9c76fe9e4deb984"
+          description: OK
+        500:
+          $ref: "#/components/schemas/error500"
 components:
   schemas:
     error500:

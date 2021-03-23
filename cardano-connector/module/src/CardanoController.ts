@@ -5,6 +5,8 @@ import { CardanoError } from './CardanoError';
 import { CardanoService } from './CardanoService';
 import { CardanoBlockchainInfo } from './constants';
 import { GenerateWalletMnemonic } from './dto/GenerateWalletMnemonic';
+import { GenerateAddress } from './dto/GenerateAddress';
+import { GeneratePrivateKey } from './dto/GeneratePrivateKey';
 
 function throwError(e) {
   throw new CardanoError(
@@ -65,6 +67,24 @@ export abstract class CardanoController {
   async getTransactionsByAccount(@Param('address') address: string): Promise<Transaction[]> {
     try {
       return await this.service.getTransactionsByAccount(address);
+    } catch (e) {
+      throwError(e);
+    }
+  }
+
+  @Get('v3/cardano/address/:xpub/:index')
+  async generateAddress(@Param() params: GenerateAddress): Promise<{ address: string }> {
+    try {
+      return await this.service.generateAddress(params.xpub, Number(params.index));
+    } catch (e) {
+      throwError(e);
+    }
+  }
+
+  @Post('v3/cardano/wallet/priv')
+  async generatePrivateKey(@Body() body: GeneratePrivateKey): Promise<{ key: string }> {
+    try {
+      return await this.service.generatePrivateKey(body.mnemonic, body.index);
     } catch (e) {
       throwError(e);
     }
