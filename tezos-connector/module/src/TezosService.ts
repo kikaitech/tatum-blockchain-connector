@@ -1,4 +1,5 @@
 import { PinoLogger } from 'nestjs-pino';
+import axios from 'axios';
 
 export abstract class TezosService {
   protected constructor(protected readonly logger: PinoLogger) {}
@@ -14,4 +15,21 @@ export abstract class TezosService {
     ]);
     return `${url}:${port}/graphql`;
   };
+
+  public async getBlock(hash: string): Promise<any> {
+    const graphQLUrl = await this.getGraphQLEndpoint();
+    const { block } = (
+      await axios.post(graphQLUrl, {
+        query: `{ block (block: "${hash}"){
+          protocol
+          chainId
+          header { level proto predecessor timestamp operationsHash validationPass }
+          metadata { protocol baker }
+          constants { bakingRewardPerEndorsement initialEndorsers blocksPerRollSnapshot }
+          operations { info { protocol hash chainId  signature } }
+        } }`,
+      })
+    ).data.data;
+    return block
+  }
 }

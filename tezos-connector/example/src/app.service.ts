@@ -10,7 +10,7 @@ export class AppService extends TezosService {
   }
 
   protected getNodesUrl(): Promise<string[]> {
-    return Promise.resolve(['http://127.0.0.1']);
+    return Promise.resolve(['http://192.168.99.193']);
   }
 
   protected getTezosGraphQLPort(): Promise<number> {
