@@ -27,7 +27,7 @@ export abstract class CardanoController {
     }
   }
 
-  @Post('v3/cardano/wallet')
+  @Post('/v3/cardano/wallet')
   async generateWallet(
     @Body() body: GenerateWalletMnemonic,
   ): Promise<Tatum.Wallet> {
@@ -76,7 +76,7 @@ export abstract class CardanoController {
     }
   }
 
-  @Get('v3/cardano/address/:xpub/:index')
+  @Get('/v3/cardano/address/:xpub/:index')
   async generateAddress(
     @Param() params: GenerateAddress,
   ): Promise<{ address: string }> {
@@ -90,7 +90,7 @@ export abstract class CardanoController {
     }
   }
 
-  @Post('v3/cardano/wallet/priv')
+  @Post('/v3/cardano/wallet/priv')
   async generatePrivateKey(
     @Body() body: GeneratePrivateKey,
   ): Promise<{ key: string }> {

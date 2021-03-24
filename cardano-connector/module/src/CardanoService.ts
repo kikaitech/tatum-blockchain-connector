@@ -51,7 +51,7 @@ export abstract class CardanoService {
           fees
           slotLeader { description, hash }
           forgedAt
-          merkelRoot
+          merkleRoot
           number
           opCert
           slotInEpoch
