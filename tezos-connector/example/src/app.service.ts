@@ -9,11 +9,9 @@ export class AppService extends TezosService {
     super(logger);
   }
 
-  protected getNodesUrl(): Promise<string[]> {
-    return Promise.resolve(['http://192.168.99.193']);
-  }
-
-  protected getTezosGraphQLPort(): Promise<number> {
-    return Promise.resolve(3100);
+  protected getRpcClient(): Promise<string> {
+    // return Promise.resolve('https://mainnet-tezos.giganode.io');
+    return Promise.resolve('http://192.168.99.193:5001');
+    // return Promise.resolve('https://edonet-tezos.giganode.io');
   }
 }
