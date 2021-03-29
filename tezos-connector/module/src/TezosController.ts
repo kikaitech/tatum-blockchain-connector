@@ -1,13 +1,13 @@
 import { TezosService } from './TezosService';
 import { TezosError } from './TezosError';
-import { Get, Param } from '@nestjs/common';
+import { Get, Param, Query } from '@nestjs/common';
 import {
   BlockHeaderResponse,
   BlockResponse,
   ContractResponse,
   PreapplyResponse
 } from '@taquito/rpc';
-
+import { Wallet } from '@tatumio/tatum';
 
 function throwError(e) {
   throw new TezosError(
@@ -17,7 +17,7 @@ function throwError(e) {
 }
 
 export abstract class TezosController {
-  protected constructor(protected readonly service: TezosService) {}
+  protected constructor(protected readonly service: TezosService) { }
 
   @Get('/v3/tezos/info')
   async getInfo(): Promise<BlockHeaderResponse> {
@@ -63,5 +63,14 @@ export abstract class TezosController {
       throwError(e);
     }
   }
+
+  // @Get('v3/tezos/wallet')
+  // async generateWallet(@Query('mnemonic') mnemonic: string): Promise<Wallet> {
+  //   try {
+  //     return await this.service.generateWallet(mnemonic);
+  //   } catch (e) {
+  //     throwError(e);
+  //   }
+  // }
 
 }
