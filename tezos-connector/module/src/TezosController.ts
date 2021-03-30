@@ -64,13 +64,13 @@ export abstract class TezosController {
     }
   }
 
-  // @Get('v3/tezos/wallet')
-  // async generateWallet(@Query('mnemonic') mnemonic: string): Promise<Wallet> {
-  //   try {
-  //     return await this.service.generateWallet(mnemonic);
-  //   } catch (e) {
-  //     throwError(e);
-  //   }
-  // }
+  @Get('v3/tezos/wallet')
+  async generateWallet(@Query('mnemonic') mnemonic: string): Promise<Wallet> {
+    try {
+      return await this.service.generateWallet(mnemonic);
+    } catch (e) {
+      throwError(e);
+    }
+  }
 
 }

@@ -1,8 +1,7 @@
 import { PinoLogger } from 'nestjs-pino';
 import axios from 'axios';
 import {
-  Currency,
-  generateWallet,
+  generateXtzWallet,
   Wallet,
 } from '@tatumio/tatum';
 // import { TezosToolkit } from '@taquito/taquito';
@@ -25,8 +24,6 @@ export abstract class TezosService {
   protected abstract getRpcClient(): Promise<string>;
 
   protected abstract getNodesUrl(): Promise<string>;
-
-  protected abstract isTestnet(): Promise<boolean>;
 
   public async getBlockChainInfo(): Promise<BlockHeaderResponse> {
     const url = await this.getNodesUrl();
@@ -58,8 +55,8 @@ export abstract class TezosService {
     return transaction[0];
   }
 
-  // public async generateWallet(mnem?: string): Promise<Wallet> {
-  //   return generateWallet(Currency.ZTX, await this.isTestnet(), mnem);
-  // }
+  public async generateWallet(mnem?: string): Promise<Wallet> {
+    return generateXtzWallet(mnem);
+  }
 
 }
