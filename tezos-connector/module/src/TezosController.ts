@@ -1,6 +1,13 @@
 import { TezosService } from './TezosService';
 import { TezosError } from './TezosError';
-import { Get, Param } from '@nestjs/common';
+import { Get, Param, Query } from '@nestjs/common';
+import {
+  BlockHeaderResponse,
+  BlockResponse,
+  ContractResponse,
+  PreapplyResponse
+} from '@taquito/rpc';
+import { Wallet } from '@tatumio/tatum';
 
 function throwError(e) {
   throw new TezosError(
@@ -10,12 +17,57 @@ function throwError(e) {
 }
 
 export abstract class TezosController {
-  protected constructor(protected readonly service: TezosService) {}
+  protected constructor(protected readonly service: TezosService) { }
 
-  @Get('/v3/tezos/:hash')
-  async getBlock(@Param('hash') hash: string): Promise<any> {
+  @Get('/v3/tezos/info')
+  async getInfo(): Promise<BlockHeaderResponse> {
+    try {
+      return await this.service.getBlockChainInfo();
+    } catch (e) {
+      throwError(e);
+    }
+  }
+
+  @Get('/v3/tezos/block/:hash')
+  async getBlock(@Param('hash') hash: string): Promise<BlockResponse> {
     try {
       return await this.service.getBlock(hash);
+    } catch (e) {
+      throwError(e);
+    }
+  }
+
+  @Get('/v3/tezos/account/:address')
+  async getAccount(@Param('address') address: string): Promise<ContractResponse> {
+    try {
+      return await this.service.getAccount(address);
+    } catch (e) {
+      throwError(e);
+    }
+  }
+
+  @Get('/v3/tezos/account/:address/transactions')
+  async getTransactionsByAccount(@Param('address') address: string): Promise<PreapplyResponse[]> {
+    try {
+      return await this.service.getTransactionsByAccount(address);
+    } catch (e) {
+      throwError(e);
+    }
+  }
+
+  @Get('/v3/tezos/transaction/:hash')
+  async getTransaction(@Param('hash') hash: string): Promise<PreapplyResponse> {
+    try {
+      return await this.service.getTransaction(hash);
+    } catch (e) {
+      throwError(e);
+    }
+  }
+
+  @Get('v3/tezos/wallet')
+  async generateWallet(@Query('mnemonic') mnemonic: string): Promise<Wallet> {
+    try {
+      return await this.service.generateWallet(mnemonic);
     } catch (e) {
       throwError(e);
     }
