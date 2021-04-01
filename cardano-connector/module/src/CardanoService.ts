@@ -1,4 +1,4 @@
-import { Block, PaymentAddress, Transaction, TransactionOutput } from '@cardano-graphql/client-ts';
+import { Block, PaymentAddress, Transaction } from '@cardano-graphql/client-ts';
 import CardanoWasm = require('@emurgo/cardano-serialization-lib-nodejs');
 import * as Tatum from '@tatumio/tatum';
 import axios from 'axios';
@@ -115,32 +115,38 @@ export abstract class CardanoService {
 
   public async getTransactionsByAccount(
     address: string,
+    pageSize: number,
+    offset: number
   ): Promise<Transaction[]> {
     const graphQLUrl = await this.getGraphQLEndpoint();
     const { transactions } = (
       await axios.post(graphQLUrl, {
-        query: `{ transactions (where: {
+        query: `{ transactions (
+          limit: ${pageSize}
+          offset: ${offset}
+          where: {
             _or: [
               { inputs: { address: { _eq: "${address}" } } }
               { outputs: { address: { _eq: "${address}" } } }
             ]
-          }) {
-            block { hash number }
-            blockIndex
-            deposit
-            fee
-            inputs { address sourceTxHash sourceTxIndex }
-            inputs_aggregate { aggregate { count } }
-            outputs { address index txHash value }
-            outputs_aggregate { aggregate { count }}
-            invalidBefore
-            invalidHereafter
-            size
-            totalOutput
-            includedAt
-            withdrawals { address amount transaction { hash }}
-            withdrawals_aggregate { aggregate { count } }
           }
+        ) {
+          block { hash number }
+          blockIndex
+          deposit
+          fee
+          inputs { address sourceTxHash sourceTxIndex }
+          inputs_aggregate { aggregate { count } }
+          outputs { address index txHash value }
+          outputs_aggregate { aggregate { count }}
+          invalidBefore
+          invalidHereafter
+          size
+          totalOutput
+          includedAt
+          withdrawals { address amount transaction { hash }}
+          withdrawals_aggregate { aggregate { count } }
+        }
         }`,
       })
     ).data.data;
@@ -185,7 +191,7 @@ export abstract class CardanoService {
     const fromUTxOs = (
       await axios.post(graphQLUrl, {
         query: `{ utxos (where: {
-            address: { 
+            address: {
               _eq: "${body.from}"
             }
           }) {
@@ -196,7 +202,7 @@ export abstract class CardanoService {
         }`,
       })
     ).data.data.utxos;
-    
+
     let fromQuantity = 0;
     for (const utxo of fromUTxOs) {
       fromQuantity += parseInt(utxo.value);

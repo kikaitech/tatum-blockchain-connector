@@ -1,5 +1,5 @@
 import { Block, Transaction, PaymentAddress } from '@cardano-graphql/client-ts';
-import { Get, Post, Body, Param } from '@nestjs/common';
+import { Get, Post, Body, Param, Query } from '@nestjs/common';
 import * as Tatum from '@tatumio/tatum';
 import { CardanoError } from './CardanoError';
 import { CardanoService } from './CardanoService';
@@ -7,6 +7,7 @@ import { CardanoBlockchainInfo } from './constants';
 import { GenerateWalletMnemonic } from './dto/GenerateWalletMnemonic';
 import { GenerateAddress } from './dto/GenerateAddress';
 import { GeneratePrivateKey } from './dto/GeneratePrivateKey';
+import { GetTransactionsByAccountQuery } from './dto/GetTransactionsByAccountQuery';
 
 function throwError(e) {
   throw new CardanoError(
@@ -68,9 +69,14 @@ export abstract class CardanoController {
   @Get('/v3/cardano/account/:address/transactions')
   async getTransactionsByAccount(
     @Param('address') address: string,
+    @Query() query: GetTransactionsByAccountQuery
   ): Promise<Transaction[]> {
     try {
-      return await this.service.getTransactionsByAccount(address);
+      return await this.service.getTransactionsByAccount(
+        address,
+        query.pageSize,
+        query.offset
+      );
     } catch (e) {
       throwError(e);
     }
