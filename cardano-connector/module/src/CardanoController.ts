@@ -107,6 +107,17 @@ export abstract class CardanoController {
     }
   }
 
+  @Post('/v3/cardano/broadcast')
+  async broadcast(
+    @Body('txData') txData: string
+  ): Promise<{ txId: string }> {
+    try {
+      return await this.service.broadcast(txData);
+    } catch (e) {
+      throwError(e);
+    }
+  }
+
   @Post('/v3/cardano/transaction')
   async sendTransaction(
     @Body() body: Tatum.TransferAda,

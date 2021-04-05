@@ -258,6 +258,36 @@ paths:
           description: OK
         500:
           $ref: "#/components/schemas/error500"
+  /v3/cardano/broadcast:
+    post:
+      tags:
+        - Blockchain / Cardano
+      summary: Broadcast Cardano transaction
+      description: |
+        <h4>5 credits per API call.</h4><br/>
+        <p>Broadcast Cardano transaction. This method is used internally from Tatum Middleware or Tatum client libraries.
+        It is possible to create custom signing mechanism and use this method only for broadcasting data to the blockchain.</p>
+      operationId: CardanoBroadcast
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                txData:
+                  type: string
+                  description: Transaction data.
+                  example: "83a400818258207aa56587eefe3bf7597a0cf5bcfbb9294f8d8ce69017b25198de74c585abef720101828258390094adf2d6d52d868d96714c9730d71b883f9666dd690ffe76e1ea144a9c6b98821de0360d005ffc073487bca8fd3e64338e462e7f13547bb81a01312d00825839001f34a1cb96d54a43d199ec2446f051d72adbd6576eb92206bc23fd005cd7064e0630c119aca1da1ba09526c24c5b128d328f349fda8371551a3598126b021a00029151031a0162c456a100818258201415a4576baa24dee656996aed13501dff465e1924f1d5df4a20951a4a65e254584035c87febca0b147b68b70a44c15f0b4a7bd5aeab38d32e7531b02545515dbc3e1420f26dab185bc814296a9fde20aabb4d2934b9cde892c01438f1f54f902309f6"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardanoSendTxSuccessfully"
+          description: OK
+        500:
+          $ref: "#/components/schemas/error500"
   /v3/cardano/transaction:
     post:
       tags:
@@ -299,12 +329,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  txId:
-                    type: string
-                    description: The ID of transaction
-                    example: "0b813ae97d0b7512e92ed3e5bfeafefb9d08e4bcd5ecf9c6729b97aaf2cb0e7c"
+                $ref: "#/components/schemas/CardanoSendTxSuccessfully"
           description: OK
         500:
           $ref: "#/components/schemas/error500"
@@ -535,7 +560,8 @@ components:
                 $ref: "#/components/schemas/address"
               amount:
                 description: the amount of withdrawal.
-                $ref: "#/components/schemas/hash"
+                type: string
+                example: "30000000"
               transaction:
                 type: object
                 properties:
@@ -602,3 +628,10 @@ components:
               type: number
               description: a number of unspent transaction outputs
               example: 1
+    CardanoSendTxSuccessfully:
+      type: object
+      properties:
+        txId:
+          type: string
+          description: The ID of transaction
+          example: "0b813ae97d0b7512e92ed3e5bfeafefb9d08e4bcd5ecf9c6729b97aaf2cb0e7c"
