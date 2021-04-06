@@ -3,7 +3,6 @@ import * as Tatum from '@tatumio/tatum';
 import axios from 'axios';
 import { PinoLogger } from 'nestjs-pino';
 import { CardanoBlockchainInfo } from './constants';
-import { CardanoError } from './CardanoError';
 
 export abstract class CardanoService {
   protected constructor(protected readonly logger: PinoLogger) {}
@@ -179,20 +178,25 @@ export abstract class CardanoService {
     return { key };
   }
 
+  public async broadcast(
+    txData: string,
+  ): Promise<{ txId: string }> {
+    const graphQLUrl = await this.getGraphQLEndpoint();
+    const txId = (await axios.post(graphQLUrl, {
+      query: `mutation {
+        submitTransaction(transaction: "${txData}") {
+          hash
+        }
+      }`,
+    })).data.data.submitTransaction.hash;
+    return { txId: txId };
+  }
+
   public async sendTransaction(
     body: Tatum.TransferAda,
   ): Promise<{ txId: string }> {
     const graphQLUrl = await this.getGraphQLEndpoint();
     const transaction = await Tatum.prepareADATransaction(body, graphQLUrl);
-    const txId = (
-      await axios.post(graphQLUrl, {
-        query: `mutation {
-          submitTransaction(transaction: "${transaction}") {
-            hash
-          }
-        }`,
-      })
-    ).data.data.submitTransaction.hash;
-    return { txId };
+    return await this.broadcast(transaction);
   }
 }
