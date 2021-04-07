@@ -3,6 +3,9 @@ import axios from 'axios';
 import {
   generateXtzWallet,
   Wallet,
+  generateAddressFromXPub,
+  generatePrivateKeyFromMnemonic,
+  Currency,
 } from '@tatumio/tatum';
 // import { TezosToolkit } from '@taquito/taquito';
 // import { TezBridgeSigner } from '@taquito/tezbridge-signer';
@@ -57,6 +60,32 @@ export abstract class TezosService {
 
   public async generateWallet(mnem?: string): Promise<Wallet> {
     return generateXtzWallet(mnem);
+  }
+
+  public async generateAddress(
+    xpub: string,
+    i: number,
+  ): Promise<{ address: string }> {
+    const address = await generateAddressFromXPub(
+      Currency.XTZ,
+      true,
+      xpub,
+      i,
+    );
+    return { address };
+  }
+
+  public async generatePrivateKey(
+    mnemonic: string,
+    i: number,
+  ): Promise<{ key: string }> {
+    const key = await generatePrivateKeyFromMnemonic(
+      Currency.XTZ,
+      true,
+      mnemonic,
+      i,
+    );
+    return { key };
   }
 
 }
