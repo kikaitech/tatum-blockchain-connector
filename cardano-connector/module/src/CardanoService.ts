@@ -1,5 +1,13 @@
 import { Block, PaymentAddress, Transaction } from '@cardano-graphql/client-ts';
-import * as Tatum from '@tatumio/tatum';
+import {
+  Wallet,
+  Currency,
+  TransferAda,
+  generateAdaWallet,
+  generateAddressFromXPub,
+  generatePrivateKeyFromMnemonic,
+  prepareADATransaction
+} from '@tatumio/tatum';
 import axios from 'axios';
 import { PinoLogger } from 'nestjs-pino';
 import { CardanoBlockchainInfo } from './constants';
@@ -37,8 +45,8 @@ export abstract class CardanoService {
     };
   }
 
-  public async generateWallet(mnem?: string): Promise<Tatum.Wallet> {
-    return Tatum.generateAdaWallet(mnem);
+  public async generateWallet(mnem?: string): Promise<Wallet> {
+    return generateAdaWallet(mnem);
   }
 
   public async getBlock(hash: string): Promise<Block> {
@@ -155,8 +163,8 @@ export abstract class CardanoService {
     i: number,
   ): Promise<{ address: string }> {
     const testnet = await this.isTestnet();
-    const address = await Tatum.generateAddressFromXPub(
-      Tatum.Currency.ADA,
+    const address = await generateAddressFromXPub(
+      Currency.ADA,
       testnet,
       xpub,
       i,
@@ -169,8 +177,8 @@ export abstract class CardanoService {
     i: number,
   ): Promise<{ key: string }> {
     const testnet = await this.isTestnet();
-    const key = await Tatum.generatePrivateKeyFromMnemonic(
-      Tatum.Currency.ADA,
+    const key = await generatePrivateKeyFromMnemonic(
+      Currency.ADA,
       testnet,
       mnemonic,
       i,
@@ -193,10 +201,29 @@ export abstract class CardanoService {
   }
 
   public async sendTransaction(
-    body: Tatum.TransferAda,
+    body: TransferAda,
   ): Promise<{ txId: string }> {
     const graphQLUrl = await this.getGraphQLEndpoint();
-    const transaction = await Tatum.prepareADATransaction(body, graphQLUrl);
+    const [
+      { data: { data: { utxos } } },
+      { tip: { slotNo } }
+    ] = await Promise.all([
+      axios.post(graphQLUrl, {
+        query: `{ utxos (where: {
+            address: {
+              _eq: "${body.from}"
+            }
+          }) {
+            txHash
+            index
+            value
+          }
+        }`,
+      }),
+      this.getBlockChainInfo()
+    ]);
+
+    const transaction = await prepareADATransaction(body, utxos, slotNo);
     return await this.broadcast(transaction);
   }
 }
