@@ -7,14 +7,14 @@ import {
   ContractResponse,
   PreapplyResponse
 } from '@taquito/rpc';
-import { Wallet } from '@tatumio/tatum';
+import { Wallet, TransferXtz } from '@tatumio/tatum';
 import { GenerateWalletMnemonic } from './dto/GenerateWalletMnemonic';
 import { GeneratePrivateKey } from './dto/GeneratePrivateKey';
 import { GenerateAddress } from './dto/GenerateAddress';
 
 function throwError(e) {
   throw new TezosError(
-    `Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`,
+    `Unexpected error occurred. Reason: ${e.message || e.response.data || e}`,
     'cardano.error',
   );
 }
@@ -67,38 +67,50 @@ export abstract class TezosController {
     }
   }
 
-  @Post('v3/tezos/wallet')
-  async generateWallet(
-    @Body() body: GenerateWalletMnemonic,
-  ): Promise<Wallet> {
-    try {
-      return await this.service.generateWallet(body.mnemonic);
-    } catch (e) {
-      throwError(e);
-    }
-  }
+  // @Post('v3/tezos/wallet')
+  // async generateWallet(
+  //   @Body() body: GenerateWalletMnemonic,
+  // ): Promise<Wallet> {
+  //   try {
+  //     return await this.service.generateWallet(body.mnemonic);
+  //   } catch (e) {
+  //     throwError(e);
+  //   }
+  // }
 
 
-  @Get('/v3/tezos/address/:xpub/:index')
-  async generateAddress(
-    @Param() params: GenerateAddress,
-  ): Promise<{ address: string }> {
-    try {
-      return await this.service.generateAddress(
-        params.xpub,
-        Number(params.index),
-      );
-    } catch (e) {
-      throwError(e);
-    }
-  }
+  // @Get('/v3/tezos/address/:xpub/:index')
+  // async generateAddress(
+  //   @Param() params: GenerateAddress,
+  // ): Promise<{ address: string }> {
+  //   try {
+  //     return await this.service.generateAddress(
+  //       params.xpub,
+  //       Number(params.index),
+  //     );
+  //   } catch (e) {
+  //     throwError(e);
+  //   }
+  // }
 
-  @Post('/v3/tezos/wallet/priv')
-  async generatePrivateKey(
-    @Body() body: GeneratePrivateKey,
-  ): Promise<{ key: string }> {
+  // @Post('/v3/tezos/wallet/priv')
+  // async generatePrivateKey(
+  //   @Body() body: GeneratePrivateKey,
+  // ): Promise<{ key: string }> {
+  //   try {
+  //     return await this.service.generatePrivateKey(body.mnemonic, body.index);
+  //   } catch (e) {
+  //     throwError(e);
+  //   }
+  // }
+
+  @Post('/v3/tezos/transaction')
+  async sendTransaction(
+    @Body() body: TransferXtz,
+    @Body() testnet: boolean,
+  ): Promise<{ txId: string }> {
     try {
-      return await this.service.generatePrivateKey(body.mnemonic, body.index);
+      return await this.service.sendTransaction(body, testnet);
     } catch (e) {
       throwError(e);
     }

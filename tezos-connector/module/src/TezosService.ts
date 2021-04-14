@@ -1,17 +1,15 @@
 import { PinoLogger } from 'nestjs-pino';
 import axios from 'axios';
 import {
-  generateXtzWallet,
-  Wallet,
-  generateAddressFromXPub,
-  generatePrivateKeyFromMnemonic,
-  Currency,
+  // generateXtzWallet,
+  // Wallet,
+  // generateAddressFromXPub,
+  // generatePrivateKeyFromMnemonic,
+  // Currency,
+  TransferXtz,
+  sendXtzTransaction,
+  broadcastXtzTransaction,
 } from '@tatumio/tatum';
-// import { TezosToolkit } from '@taquito/taquito';
-// import { TezBridgeSigner } from '@taquito/tezbridge-signer';
-
-// const tezos = new TezosToolkit('https://edonet-tezos.giganode.io/');
-// tezos.setProvider({ signer: new TezBridgeSigner() });
 
 import {
   BlockHeaderResponse,
@@ -58,34 +56,42 @@ export abstract class TezosService {
     return transaction[0];
   }
 
-  public async generateWallet(mnem?: string): Promise<Wallet> {
-    return generateXtzWallet(mnem);
-  }
+  // public async generateWallet(mnem?: string): Promise<Wallet> {
+  //   return generateXtzWallet(mnem);
+  // }
 
-  public async generateAddress(
-    xpub: string,
-    i: number,
-  ): Promise<{ address: string }> {
-    const address = await generateAddressFromXPub(
-      Currency.XTZ,
-      true,
-      xpub,
-      i,
-    );
-    return { address };
-  }
+  // public async generateAddress(
+  //   xpub: string,
+  //   i: number,
+  // ): Promise<{ address: string }> {
+  //   const address = await generateAddressFromXPub(
+  //     Currency.XTZ,
+  //     true,
+  //     xpub,
+  //     i,
+  //   );
+  //   return { address };
+  // }
 
-  public async generatePrivateKey(
-    mnemonic: string,
-    i: number,
-  ): Promise<{ key: string }> {
-    const key = await generatePrivateKeyFromMnemonic(
-      Currency.XTZ,
-      true,
-      mnemonic,
-      i,
-    );
-    return { key };
+  // public async generatePrivateKey(
+  //   mnemonic: string,
+  //   i: number,
+  // ): Promise<{ key: string }> {
+  //   const key = await generatePrivateKeyFromMnemonic(
+  //     Currency.XTZ,
+  //     true,
+  //     mnemonic,
+  //     i,
+  //   );
+  //   return { key };
+  // }
+
+  public async sendTransaction(
+    body: TransferXtz,
+    testnet: boolean
+  ): Promise<{ txId: string }> {
+    const txId = await sendXtzTransaction(body, testnet);
+    return { txId };
   }
 
 }
