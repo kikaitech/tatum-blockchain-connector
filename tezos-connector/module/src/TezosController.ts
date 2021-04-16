@@ -104,6 +104,18 @@ export abstract class TezosController {
   //   }
   // }
 
+  @Post('/v3/tezos/broadcast')
+  async broadcast(
+    @Body('txData') txData: string,
+    @Body('testnet') testnet: boolean,
+  ): Promise<{ txId: string }> {
+    try {
+      return await this.service.broadcast(txData, testnet);
+    } catch (e) {
+      throwError(e);
+    }
+  }
+
   @Post('/v3/tezos/transaction')
   async sendTransaction(
     @Body() body: TransferXtz,

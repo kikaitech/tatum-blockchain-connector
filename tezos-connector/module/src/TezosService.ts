@@ -86,6 +86,13 @@ export abstract class TezosService {
   //   return { key };
   // }
 
+  public async broadcast(
+    txData: string, testnet: boolean
+  ): Promise<{ txId: string }> {
+    const txId = await broadcastXtzTransaction(txData, testnet);
+    return { txId };
+  }
+
   public async sendTransaction(
     body: TransferXtz,
     testnet: boolean
