@@ -67,42 +67,42 @@ export abstract class TezosController {
     }
   }
 
-  // @Post('v3/tezos/wallet')
-  // async generateWallet(
-  //   @Body() body: GenerateWalletMnemonic,
-  // ): Promise<Wallet> {
-  //   try {
-  //     return await this.service.generateWallet(body.mnemonic);
-  //   } catch (e) {
-  //     throwError(e);
-  //   }
-  // }
+  @Post('v3/tezos/wallet')
+  async generateWallet(
+    @Body() body: GenerateWalletMnemonic,
+  ): Promise<Wallet> {
+    try {
+      return await this.service.generateWallet(body.mnemonic);
+    } catch (e) {
+      throwError(e);
+    }
+  }
 
 
-  // @Get('/v3/tezos/address/:xpub/:index')
-  // async generateAddress(
-  //   @Param() params: GenerateAddress,
-  // ): Promise<{ address: string }> {
-  //   try {
-  //     return await this.service.generateAddress(
-  //       params.xpub,
-  //       Number(params.index),
-  //     );
-  //   } catch (e) {
-  //     throwError(e);
-  //   }
-  // }
+  @Get('/v3/tezos/address/:xpub/:index')
+  async generateAddress(
+    @Param() params: GenerateAddress,
+  ): Promise<{ address: string }> {
+    try {
+      return await this.service.generateAddress(
+        params.xpub,
+        Number(params.index),
+      );
+    } catch (e) {
+      throwError(e);
+    }
+  }
 
-  // @Post('/v3/tezos/wallet/priv')
-  // async generatePrivateKey(
-  //   @Body() body: GeneratePrivateKey,
-  // ): Promise<{ key: string }> {
-  //   try {
-  //     return await this.service.generatePrivateKey(body.mnemonic, body.index);
-  //   } catch (e) {
-  //     throwError(e);
-  //   }
-  // }
+  @Post('/v3/tezos/wallet/priv')
+  async generatePrivateKey(
+    @Body() body: GeneratePrivateKey,
+  ): Promise<{ key: string }> {
+    try {
+      return await this.service.generatePrivateKey(body.mnemonic, body.index);
+    } catch (e) {
+      throwError(e);
+    }
+  }
 
   @Post('/v3/tezos/broadcast')
   async broadcast(
