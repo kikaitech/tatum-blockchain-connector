@@ -44,9 +44,13 @@ export abstract class TezosService {
     return account;
   }
 
-  public async getTransactionsByAccount(address: string): Promise<PreapplyResponse[]> {
+  public async getTransactionsByAccount(
+    address: string,
+    limit: number,
+    offset: number
+  ): Promise<PreapplyResponse[]> {
     const url = await this.getNodesUrl();
-    const transactions = (await axios.get(`${url}/operations?limit=500&account_id=${address}&operation_kind=transaction&offset=0`)).data;
+    const transactions = (await axios.get(`${url}/operations?limit=${limit}&account_id=${address}&operation_kind=transaction&offset=${offset}`)).data;
     return transactions;
   }
 

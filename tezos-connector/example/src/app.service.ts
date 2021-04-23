@@ -16,8 +16,8 @@ export class AppService extends TezosService {
   }
 
   protected getNodesUrl(): Promise<string> {
-    // return Promise.resolve('https://api.teztracker.com/v2/data/tezos/delphinet');
-    return Promise.resolve('https://api.teztracker.com/v2/data/tezos/mainnet');
+    return Promise.resolve('https://api.teztracker.com/v2/data/tezos/edonet');
+    // return Promise.resolve('https://api.teztracker.com/v2/data/tezos/mainnet');
   }
 
 }

@@ -1,6 +1,6 @@
 import { TezosService } from './TezosService';
 import { TezosError } from './TezosError';
-import { Body, Get, Param, Post } from '@nestjs/common';
+import { Body, Get, Param, Post, Query } from '@nestjs/common';
 import {
   BlockHeaderResponse,
   BlockResponse,
@@ -11,6 +11,7 @@ import { Wallet, TransferXtz } from '@tatumio/tatum';
 import { GenerateWalletMnemonic } from './dto/GenerateWalletMnemonic';
 import { GeneratePrivateKey } from './dto/GeneratePrivateKey';
 import { GenerateAddress } from './dto/GenerateAddress';
+import { GetTransactionsByAccountQuery } from './dto/GetTransactionsByAccountQuery';
 
 function throwError(e) {
   throw new TezosError(
@@ -50,9 +51,16 @@ export abstract class TezosController {
   }
 
   @Get('/v3/tezos/account/:address/transactions')
-  async getTransactionsByAccount(@Param('address') address: string): Promise<PreapplyResponse[]> {
+  async getTransactionsByAccount(
+    @Param('address') address: string,
+    @Query() query: GetTransactionsByAccountQuery,
+  ): Promise<PreapplyResponse[]> {
     try {
-      return await this.service.getTransactionsByAccount(address);
+      return await this.service.getTransactionsByAccount(
+        address,
+        query.pageSize,
+        query.offset
+      );
     } catch (e) {
       throwError(e);
     }
@@ -67,7 +75,7 @@ export abstract class TezosController {
     }
   }
 
-  @Post('v3/tezos/wallet')
+  @Post('/v3/tezos/wallet')
   async generateWallet(
     @Body() body: GenerateWalletMnemonic,
   ): Promise<Wallet> {
